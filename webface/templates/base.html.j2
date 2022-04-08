@@ -19,12 +19,26 @@
 
 
   <nav>
-  <p><img src="{{ url_for('static', filename='flask-icon.png') }}" /></p>
+
+  <p id="nick" style="width:20%; float:right; border: solid 2px black; ">
+  {% if 'nick' in session %}
+    Jsi přihlášen jako {{ session['nick'] }}. 
+    <a href="{{ url_for('logout') }}">LogOut</a>
+  {% else %}
+    Nejsi přihlášen!!!
+  {% endif %}
+  <p>
+
+  <img src="{{ url_for('static', filename='flask-icon.png') }}" /></p>
   <ul>
     <li><a href="{{ url_for('index') }}">Index</a></li>
     <li><a href="{{ url_for('login') }}">Login</a></li>
     <li><a href="{{ url_for('registrate') }}">Registrace</a></li>
-  </ul></nav>
+  </ul>
+  </nav>
+
+
+  </p>
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}
@@ -42,6 +56,34 @@
 
   <h1>Nástěnka</h1>
 
+  <form action="{{ url_for('insert') }}" method="post">
+    <textarea name="prispevek" id="prispevek" rows="12" cols="70"
+>Sem vlož příspěvek</textarea>
+    <button type="submit">Odeslat příspěvěk!</button>
+  </form>
+
+  <form action="http://duckduckgo.com/" method="get">
+    DDgo: <input type="text" name="q" id="q" value="">
+  </form>
+
+  <h2>Vloženo:</h2>
+
+      
+  <dl>
+  {% for nick, text, id in tabulka %}
+    <dt>{{ nick }}</dt>
+    <dd>
+      {{ text }}
+      {% if nick == session['nick'] %}
+      <form action="/delete/" method="post">
+        <input type="hidden" name="id" id="id" value="{{ id }}">
+        <button type="submit">Smazat</button>
+      </form>
+      {% endif %}
+    </dd>
+     
+  {% endfor %}
+  </dl>
 
 
 {% endblock obsah %}

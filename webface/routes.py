@@ -1,5 +1,5 @@
 from . import app
-from flask import render_template, request, redirect, url_for, session, flash
+from flask import render_template, request, redirect, url_for, session, flash, abort
 import functools
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -26,7 +26,14 @@ def prihlasit(function):
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("base.html.j2")
+    if "nick" in session:
+        with sqlite3.connect(dbfile) as conn:
+            tabulka = conn.execute("SELECT nick, text, id FROM prispevek")
+            # print(list(tabulka))
+        return render_template("base.html.j2", tabulka=tabulka)
+    else:
+        flash("Musíš se přihlásit!!!")
+        return redirect(url_for("login"))
 
 
 @app.route("/login/")
@@ -45,8 +52,15 @@ def login_post():
             )
         if tabulka and check_password_hash(tabulka[0][0], passwd):
             flash("Anooooo")
+            session["nick"] = nick
         else:
             flash("Neeeee")
+    return redirect(url_for("index"))
+
+
+@app.route("/logout/")
+def logout():
+    session.pop("nick", None)
     return redirect(url_for("index"))
 
 
@@ -75,3 +89,17 @@ def registrate_post():
         flash("Chyba: je nutné zadat jméno a dvakrát stejné heslo.")
         return redirect(url_for("registrate"))
     return redirect(url_for("index"))
+
+
+@app.route("/insert/", methods=["POST"])
+def insert():
+    if "nick" in session:
+        prispevek = request.form.get("prispevek")
+        with sqlite3.connect(dbfile) as conn:
+            conn.execute(
+                "INSERT INTO prispevek (text, nick) VALUES (?, ?)",
+                [prispevek, session["nick"]],
+            )
+        return redirect(url_for("index"))
+    else:
+        return abort(403)
