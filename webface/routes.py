@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
 # conn = sqlite3.connect("databaza.sqlite", isolation_level=None)
-dbfile = "databaza.sqlite"
+dbfile = "database.sqlite"
 
 # from werkzeug.security import check_password_hash
 
@@ -99,6 +99,20 @@ def insert():
             conn.execute(
                 "INSERT INTO prispevek (text, nick) VALUES (?, ?)",
                 [prispevek, session["nick"]],
+            )
+        return redirect(url_for("index"))
+    else:
+        return abort(403)
+
+
+@app.route("/delete/", methods=["POST"])
+def delete():
+    if "nick" in session:
+        delid = request.form.get("delid")
+        with sqlite3.connect(dbfile) as conn:
+            conn.execute(
+                "DELETE FROM prispevek WHERE id=? AND nick=?",
+                [delid, session["nick"]],
             )
         return redirect(url_for("index"))
     else:

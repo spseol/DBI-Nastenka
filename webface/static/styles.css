@@ -59,5 +59,16 @@ footer {
     background-color: lightblue;
 }
 
+.prispevek {
+    border-radius: 4px;
+    border: solid darkblue 2px;
+    padding: 1ex;
+}
+form {
+    display: inline;
+}
+.smazat {
+    border:solid 3px red;
+}
 
 /*# sourceMappingURL=styles.css.map */

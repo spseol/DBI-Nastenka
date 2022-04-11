@@ -27,9 +27,8 @@
   {% else %}
     Nejsi přihlášen!!!
   {% endif %}
-  <p>
 
-  <img src="{{ url_for('static', filename='flask-icon.png') }}" /></p>
+  <p><img src="{{ url_for('static', filename='flask-icon.png') }}" alt=""></p>
   <ul>
     <li><a href="{{ url_for('index') }}">Index</a></li>
     <li><a href="{{ url_for('login') }}">Login</a></li>
@@ -37,8 +36,6 @@
   </ul>
   </nav>
 
-
-  </p>
 
 {% with messages = get_flashed_messages() %}
   {% if messages %}
@@ -63,7 +60,8 @@
   </form>
 
   <form action="http://duckduckgo.com/" method="get">
-    DDgo: <input type="text" name="q" id="q" value="">
+    toto je jen ukázka atributu <strong>action</strong>:
+    <input type="text" name="q" id="q" value="">
   </form>
 
   <h2>Vloženo:</h2>
@@ -71,14 +69,14 @@
       
   <dl>
   {% for nick, text, id in tabulka %}
-    <dt>{{ nick }}</dt>
+    <dt><em>{{ nick }}</em>:</dt>
     <dd>
-      {{ text }}
+      <div class="prispevek">{{ text }}</div>
       {% if nick == session['nick'] %}
-      <form action="/delete/" method="post">
-        <input type="hidden" name="id" id="id" value="{{ id }}">
-        <button type="submit">Smazat</button>
-      </form>
+        <form action="{{ url_for('delete') }}" method="post">
+          <input type="hidden" name="delid" value="{{ id }}">
+          <button type="submit" class="smazat">Smazat</button>
+        </form>
       {% endif %}
     </dd>
      
