@@ -70,5 +70,8 @@ form {
 .smazat {
     border:solid 3px red;
 }
+.editovat {
+    border:solid 3px coral;
+}
 
 /*# sourceMappingURL=styles.css.map */

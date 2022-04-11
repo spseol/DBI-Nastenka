@@ -77,6 +77,10 @@
           <input type="hidden" name="delid" value="{{ id }}">
           <button type="submit" class="smazat">Smazat</button>
         </form>
+        <form action="{{ url_for('delete') }}" method="post">
+          <input type="hidden" name="editid" value="{{ id }}">
+          <button type="submit" class="editovat">Editovat</button>
+        </form>
       {% endif %}
     </dd>
      
