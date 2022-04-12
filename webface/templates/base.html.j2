@@ -55,13 +55,15 @@
 
   <form action="{{ url_for('insert') }}" method="post">
     <textarea name="prispevek" id="prispevek" rows="12" cols="70"
->Sem vlož příspěvek</textarea>
+                                                        >Sem vlož příspěvek</textarea><br />
     <button type="submit">Odeslat příspěvěk!</button>
   </form>
 
   <form action="http://duckduckgo.com/" method="get">
+    <p>
     toto je jen ukázka atributu <strong>action</strong>:
     <input type="text" name="q" id="q" value="">
+    </p>
   </form>
 
   <h2>Vloženo:</h2>
@@ -71,13 +73,13 @@
   {% for nick, text, id in tabulka %}
     <dt><em>{{ nick }}</em>:</dt>
     <dd>
-      <div class="prispevek">{{ text }}</div>
+      <div class="prispevek">{{ text | escape }}</div>
       {% if nick == session['nick'] %}
         <form action="{{ url_for('delete') }}" method="post">
           <input type="hidden" name="delid" value="{{ id }}">
           <button type="submit" class="smazat">Smazat</button>
         </form>
-        <form action="{{ url_for('delete') }}" method="post">
+        <form action="{{ url_for('edit') }}" method="get">
           <input type="hidden" name="editid" value="{{ id }}">
           <button type="submit" class="editovat">Editovat</button>
         </form>

@@ -16,10 +16,10 @@ slova = ("Super", "Perfekt", "Úža", "Flask")
 def prihlasit(function):
     @functools.wraps(function)
     def wrapper(*args, **kwargs):
-        if "user" in session:
+        if "nick" in session:
             return function(*args, **kwargs)
         else:
-            return redirect(url_for("login", url=request.path))
+            return redirect(url_for("login", url=request.full_path))
 
     return wrapper
 
@@ -45,17 +45,22 @@ def login():
 def login_post():
     nick = request.form.get("nick")
     passwd = request.form.get("passwd")
+    url = request.args.get("url")
     if nick and passwd:
         with sqlite3.connect(dbfile) as conn:
             tabulka = tuple(
                 conn.execute("SELECT passwd FROM uzivatel WHERE nick=?", [nick])
             )
         if tabulka and check_password_hash(tabulka[0][0], passwd):
-            flash("Anooooo")
+            flash("Joooo!")
             session["nick"] = nick
+            if url:
+                return redirect(url)
         else:
-            flash("Neeeee")
-    return redirect(url_for("index"))
+            flash("Bohužel ne!")
+    print(url)
+    print(request.full_path)
+    return redirect(request.full_path)
 
 
 @app.route("/logout/")
@@ -117,3 +122,33 @@ def delete():
         return redirect(url_for("index"))
     else:
         return abort(403)
+
+
+@app.route("/edit/", methods=["GET"])
+@prihlasit
+def edit():
+    editid = request.args.get("editid")
+    if editid:
+        with sqlite3.connect(dbfile) as conn:
+            tabulka = list(
+                conn.execute("SELECT text, id FROM prispevek WHERE id=?", [editid])
+            )
+    if tabulka:
+        return render_template("edit.html.j2", prispevek=tabulka[0][0])
+    else:
+        flash("Tento přípěvek neexistuje. Sorry!")
+        return redirect(url_for("index"))
+
+
+@app.route("/edit/", methods=["POST"])
+@prihlasit
+def edit_post():
+    editid = request.form.get("editid")
+    prispevek = request.form.get("prispevek")
+    if editid and prispevek:
+        with sqlite3.connect(dbfile) as conn:
+            conn.execute(
+                "UPDATE prispevek SET text=? WHERE id=? AND  nick=?",
+                [prispevek, editid, session["nick"]],
+            )
+    return redirect(url_for("index"))
